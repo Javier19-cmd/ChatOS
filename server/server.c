@@ -7,7 +7,7 @@
 #include <pthread.h>
 
 #define PORT 8000
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 30
 
 int clients[MAX_CLIENTS];
 int num_clients = 0;
