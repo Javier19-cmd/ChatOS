@@ -47,7 +47,7 @@ void recv_msg_handler(){
         int receive = recv(sockfd, message, BUFFER_SZ, 0);
         
         if (receive > 0){
-            printf("%s", message);
+            printf("\n%s\n", message);
             str_overwrite_stdout();
         }else if (receive == 0){
             break;
@@ -60,21 +60,66 @@ void send_msg_handler(){
     char buffer[BUFFER_SZ] = {};
     char message[BUFFER_SZ + NAME_LEN] = {};
 
+    printf("Opcion 1: mandar broadcast \n");
+    printf("Opcion 2: mandar mensaje privado \n");
+    printf("Opcion 3: ver lista de usuarios \n");
+    printf("Opcion 4: salir \n");
+
+    // int opc = 0;
+
+    // // Agarrando el input del usuario.
+
+    // if (opc == 1){
+    //     printf("Ingresa el mensaje que quieres mandar: ");
+    //     char *msg = NULL;
+    //     fgets(msg, BUFFER_SZ, stdin);
+    //     str_trim_lf(msg, BUFFER_SZ);
+    //     send(sockfd, msg, BUFFER_SZ, 0);
+    // }
+
+
+
     while(1){
 
         str_overwrite_stdout();
-        fgets(buffer, BUFFER_SZ, stdin);
-        str_trim_lf(buffer, BUFFER_SZ);
 
-        if (strcmp(buffer, "exit") == 0){
-            break;
-        }else{
-            sprintf(message, "%s: %s\n", name, buffer);
-            send(sockfd, message, strlen(message), 0);
+        printf("Ingrese la opcion que desee: ");
+
+        char opcion[BUFFER_SZ] = {};
+
+        fgets(opcion, BUFFER_SZ, stdin);
+
+        str_trim_lf(opcion, BUFFER_SZ);
+
+        if (strcmp(opcion, "1") == 0){
+            printf("Ingresa el mensaje que quieres mandar: ");
+            char msg[BUFFER_SZ + NAME_LEN] = {};
+            fgets(msg, BUFFER_SZ, stdin);
+            str_trim_lf(msg, BUFFER_SZ);
+            send(sockfd, msg, BUFFER_SZ, 0);
+
+            bzero(opcion, BUFFER_SZ);
+            bzero(msg, BUFFER_SZ + NAME_LEN);
+
         }
 
-        bzero(buffer, BUFFER_SZ);
-        bzero(message, BUFFER_SZ + NAME_LEN);
+
+        // fgets(buffer, BUFFER_SZ, stdin);
+        
+        
+
+        //printf("Texto de prueba: %s", buffer);
+        // str_trim_lf(buffer, BUFFER_SZ);
+
+        // if (strcmp(buffer, "exit") == 0){
+        //     break;
+        // }else{
+        //     sprintf(message, "%s: %s\n", name, buffer);
+        //     send(sockfd, message, strlen(message), 0);
+        // }
+
+        // bzero(buffer, BUFFER_SZ);
+        // bzero(message, BUFFER_SZ + NAME_LEN);
     }
     catch_ctrl_c_and_exit(2);
 }
@@ -125,6 +170,8 @@ int main(int argc, char **argv){
     printf("=============================\n");
     printf("\tCHATROOM el buen samaritano\n");
     printf("=============================\n");
+
+
 
     pthread_t send_msg_thread;
     if(pthread_create(&send_msg_thread, NULL, (void *) send_msg_handler, NULL) != 0){
