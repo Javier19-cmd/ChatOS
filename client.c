@@ -91,15 +91,82 @@ void send_msg_handler(){
 
         str_trim_lf(opcion, BUFFER_SZ);
 
+        // Opcion para mandar mensaje grupal.
         if (strcmp(opcion, "1") == 0){
             printf("Ingresa el mensaje que quieres mandar: ");
             char msg[BUFFER_SZ + NAME_LEN] = {};
             fgets(msg, BUFFER_SZ, stdin);
             str_trim_lf(msg, BUFFER_SZ);
+
+            // Concatenando la opcion junto al mensaje.
+            char msg2[BUFFER_SZ + NAME_LEN + 4] = {}; // Reservando espacio para agregar la opcion.
+            strcpy(msg2, msg); // Copiando el mensaje original en una nueva variable.
+            strcat(msg2, ", ");
+            strcat(msg2, opcion);
+
+            // Imprimiendo el mensaje para verificar como se va a mandar.
+            printf("Mensaje a mandar: %s\n", msg2); 
+
             send(sockfd, msg, BUFFER_SZ, 0);
 
             bzero(opcion, BUFFER_SZ);
             bzero(msg, BUFFER_SZ + NAME_LEN);
+
+        }
+        // Opcion 2: Mandar mensaje privado.
+        else if (strcmp(opcion, "2") == 0){
+            printf("Ingresa el nombre del usuario al que quieres mandar el mensaje: ");
+            char user[NAME_LEN] = {};
+            fgets(user, BUFFER_SZ, stdin);
+            str_trim_lf(user, BUFFER_SZ);
+            printf("Ingresa el mensaje que quieres mandar: ");
+            char msg[BUFFER_SZ + NAME_LEN] = {};
+            fgets(msg, BUFFER_SZ, stdin);
+            str_trim_lf(msg, BUFFER_SZ);
+
+            // Concatenando el nombre del usuario, el mensaje, la opción y la coma.
+            char msg2[BUFFER_SZ + NAME_LEN + strlen(user) + strlen(", ") + strlen(opcion)];
+            sprintf(msg2, "%s: %s, %s", user, msg, opcion);
+
+            // Imprimiendo el mensaje para verificar cómo se va a mandar.
+            printf("Mensaje a mandar: %s\n", msg2);
+
+            // Mandando el mensaje al servidor.
+            send(sockfd, msg2, strlen(msg2), 0);
+
+            bzero(opcion, BUFFER_SZ);
+            bzero(msg, BUFFER_SZ + NAME_LEN);
+            bzero(user, BUFFER_SZ);
+        
+        }// Opcion 3: Ver lista de usuarios.
+        else if (strcmp(opcion, "3") == 0) {
+            // Opcion para ver los usuarios en el servidor.
+
+            // Creando una variable string que solo tenga tabla dentro de "".
+            char tabla[NAME_LEN] = "tabla";
+
+            // Concatenando en una variable la variable tabla y la opcion elegida.
+            char msg[BUFFER_SZ + NAME_LEN + strlen(tabla) + strlen(", ") + strlen(opcion)];
+            sprintf(msg, "%s, %s", tabla, opcion);
+
+            // Imprimiendo el mensaje para verificar como se va a mandar.
+            printf("Mensaje a mandar: %s\n", msg);
+
+            // Mandando el mensaje al servidor.
+            send(sockfd, msg, strlen(msg), 0);
+
+            bzero(opcion, BUFFER_SZ);
+            bzero(msg, BUFFER_SZ + NAME_LEN + strlen(tabla) + strlen(", ") + strlen(opcion));
+        
+        }// Opcion 4: Salir del programa.
+        else if (strcmp(opcion, "4") == 0){
+
+            // Esta opcion es para salir de la ejecuion.
+            printf("Saliendo del programa...\n");
+
+            // Mandando el mensaje al servidor.
+            break;
+
 
         }
 
