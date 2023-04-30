@@ -101,16 +101,17 @@ void send_msg_handler(){
             // Concatenando la opcion junto al mensaje.
             char msg2[BUFFER_SZ + NAME_LEN + 4] = {}; // Reservando espacio para agregar la opcion.
             strcpy(msg2, msg); // Copiando el mensaje original en una nueva variable.
-            strcat(msg2, ", ");
+            strcat(msg2, "$@$");
             strcat(msg2, opcion);
 
             // Imprimiendo el mensaje para verificar como se va a mandar.
-            printf("Mensaje a mandar: %s\n", msg2); 
+            // printf("Mensaje a mandar: %s\n", msg2); 
 
-            send(sockfd, msg, BUFFER_SZ, 0);
+            send(sockfd, msg2, BUFFER_SZ, 0);
 
             bzero(opcion, BUFFER_SZ);
             bzero(msg, BUFFER_SZ + NAME_LEN);
+            bzero(msg2, BUFFER_SZ + NAME_LEN+4);
 
         }
         // Opcion 2: Mandar mensaje privado.
@@ -126,10 +127,10 @@ void send_msg_handler(){
 
             // Concatenando el nombre del usuario, el mensaje, la opción y la coma.
             char msg2[BUFFER_SZ + NAME_LEN + strlen(user) + strlen(", ") + strlen(opcion)];
-            sprintf(msg2, "%s: %s, %s", user, msg, opcion);
+            sprintf(msg2, "%s$@$%s$@$%s", msg, opcion, user);
 
             // Imprimiendo el mensaje para verificar cómo se va a mandar.
-            printf("Mensaje a mandar: %s\n", msg2);
+            // printf("Mensaje a mandar: %s\n", msg2);
 
             // Mandando el mensaje al servidor.
             send(sockfd, msg2, strlen(msg2), 0);
@@ -147,10 +148,10 @@ void send_msg_handler(){
 
             // Concatenando en una variable la variable tabla y la opcion elegida.
             char msg[BUFFER_SZ + NAME_LEN + strlen(tabla) + strlen(", ") + strlen(opcion)];
-            sprintf(msg, "%s, %s", tabla, opcion);
+            sprintf(msg, "%s$@$%s", tabla, opcion);
 
             // Imprimiendo el mensaje para verificar como se va a mandar.
-            printf("Mensaje a mandar: %s\n", msg);
+            // printf("Mensaje a mandar: %s\n", msg);
 
             // Mandando el mensaje al servidor.
             send(sockfd, msg, strlen(msg), 0);
@@ -170,23 +171,6 @@ void send_msg_handler(){
 
         }
 
-
-        // fgets(buffer, BUFFER_SZ, stdin);
-        
-        
-
-        //printf("Texto de prueba: %s", buffer);
-        // str_trim_lf(buffer, BUFFER_SZ);
-
-        // if (strcmp(buffer, "exit") == 0){
-        //     break;
-        // }else{
-        //     sprintf(message, "%s: %s\n", name, buffer);
-        //     send(sockfd, message, strlen(message), 0);
-        // }
-
-        // bzero(buffer, BUFFER_SZ);
-        // bzero(message, BUFFER_SZ + NAME_LEN);
     }
     catch_ctrl_c_and_exit(2);
 }
