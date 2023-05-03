@@ -63,7 +63,8 @@ void send_msg_handler(){
     printf("Opcion 1: mandar broadcast \n");
     printf("Opcion 2: mandar mensaje privado \n");
     printf("Opcion 3: ver lista de usuarios \n");
-    printf("Opcion 4: salir \n");
+    printf("Opcion 4: ver info de usuario \n");
+    printf("Opcion 5: salir \n");
 
     // int opc = 0;
 
@@ -160,11 +161,30 @@ void send_msg_handler(){
             bzero(msg, BUFFER_SZ + NAME_LEN + strlen(tabla) + strlen(", ") + strlen(opcion));
         
         }// Opcion 4: Salir del programa.
-        else if (strcmp(opcion, "4") == 0){
+
+        else if(strcmp(opcion, "4") == 0){
+           printf("Ingresa el nombre del usuario: ");
+            char user[NAME_LEN] = {};
+            fgets(user, BUFFER_SZ, stdin);
+            str_trim_lf(user, BUFFER_SZ);
+
+            // Concatenando el nombre del usuario, la opción y la coma.
+            char msg2[BUFFER_SZ + NAME_LEN + strlen(user) + strlen(", ") + strlen(opcion)];
+            sprintf(msg2, "%s$@$%s", user, opcion);
+
+            send(sockfd, msg2, strlen(msg2), 0);    
+
+            bzero(opcion, BUFFER_SZ);   
+            bzero(user, BUFFER_SZ);
+            bzero(msg2, BUFFER_SZ + NAME_LEN + strlen(user) + strlen(", ") + strlen(opcion));
+        }
+
+        else if (strcmp(opcion, "5") == 0){
 
             // Esta opcion es para salir de la ejecuion.
             printf("Saliendo del programa...\n");
-
+            
+            bzero(opcion, BUFFER_SZ);
             // Mandando el mensaje al servidor.
             break;
 

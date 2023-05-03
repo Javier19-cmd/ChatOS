@@ -62,16 +62,18 @@ void queue_add(client_t *cl){
 void queue_remove(int uid){
     pthread_mutex_lock(&clients_mutex);
 
+    client_t *cl = NULL;
+
     for(int i = 0; i < MAX_CLIENTS; i++){
         if(clients[i]){
             if(clients[i]->uid == uid){
+                cl = clients[i];
                 clients[i] = NULL;
                 printf("Client disconnected: %d\n", uid);
                 break;
             }
         }
     }
-
     pthread_mutex_unlock(&clients_mutex);
 }
 
@@ -87,6 +89,48 @@ int get_uid_by_name(char *name){
     return -1;
 }
 
+void show_user_info_by_uid(int uid, int uid_to_send){
+    pthread_mutex_lock(&clients_mutex);
+    // get the name of all the users
+    // that do not have the same uid as the current user
+    // and assign it to the variable users
+
+    char users[BUFFER_SZ] = {};
+
+    strcat(users, "********************\n");
+    strcat(users, "User:\n");
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        if(clients[i]){
+            if(clients[i]->uid == uid){
+                strcat(users,"Name: ");
+                strcat(users, clients[i]->name);
+                strcat(users, "\n");
+                strcat(users, "UID: ");
+                char uid_str[12];
+                sprintf(uid_str, "%d", clients[i]->uid);
+                strcat(users, uid_str);
+                strcat(users, "\n");
+                strcat(users, "IP: ");
+                strcat(users, inet_ntoa(clients[i]->address.sin_addr));
+                strcat(users, "\n");
+                strcat(users, "Port: ");
+                char port_str[12];
+                sprintf(port_str, "%d", ntohs(clients[i]->address.sin_port));
+                strcat(users, port_str);
+                strcat(users, "\n");
+            }
+        }
+    }
+
+    strcat(users, "********************\n");
+
+    pthread_mutex_unlock(&clients_mutex);
+
+    // 
+    send_message_to_specific_client(users, uid_to_send, uid_to_send);
+
+
+}
 
 void show_users(int uid){
     pthread_mutex_lock(&clients_mutex);
@@ -104,10 +148,11 @@ void show_users(int uid){
         if(clients[i]){
             if(clients[i]->uid != uid){
                 strcat(users, clients[i]->name);
-                strcat(users, "\n");
+                strcat(users, " (online)\n");
             }
         }
     }
+
     strcat(users, "********************\n");
     pthread_mutex_unlock(&clients_mutex);
 
@@ -248,6 +293,24 @@ void *handle_client(void *arg){
                     // print users  
                     printf("Showing users\n");
                     show_users(cli->uid);
+
+                }
+                else if(strcmp(opcion,"4")==0){
+                    printf("Showing user info");
+                    char *name = msg;
+
+                    int uid_to = get_uid_by_name(name);
+
+                    if(uid_to != -1){
+                        show_user_info_by_uid(uid_to, cli->uid);                        
+                    }
+                    else{
+                        char error[BUFFER_SZ] = {};
+                        strcat(error, "********************\n");
+                        strcat(error, "ERROR: User not found\n");
+                        strcat(error, "********************\n");
+                        send_message_to_specific_client(error, cli->uid, cli->uid);
+                    }
 
                 }
             
